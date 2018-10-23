@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SingIn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        #singIn {
+            width: auto;
+            margin: 50px auto 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .singTit {
+            background: rgb(7, 60, 235);
+            text-align: center;
+            font-size: 20px;
+            color: #fff;
+            border-radius: 5px;
+            height: 120px;
+            overflow: hidden;
+            width: 400px;
+            margin: 0 auto 15px;
+        }
+
+        .singTit span {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: rgb(7, 60, 235);
+            line-height: 60px;
+            margin: 30px auto 0;
+            background: #fff;
+            display: block;
+            cursor: pointer;
+        }
+
+        .sinBox {
+            width: 402px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .singDate {
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            font-size: 18px;
+            padding: 5px 0;
+        }
+
+        .sinBox span {
+            width: 50px;
+            display: inline-block;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+            margin-bottom: 5px;
+        }
+
+        .sinBox span:nth-child(7n+1) {
+            margin-left: 0;
+        }
+
+        .sinBox span.noSign {
+            background: #e5e5e5;
+            border-radius: 100%;
+            color: rgb(250, 21, 41);
+        }
+
+        .sinBox span.nowSign {
+            background: #400df5;
+            border-radius: 100%;
+            color: #fff;
+        }
+        .sinBox span.signSelect {
+            background: #dd97a8;
+            border-radius: 100%;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="singIn">
+        <p class="singTit"><span>签到</span></p>
+    </div>
+</body>
+<script src="./js/jquery-3.1.1.min.js"></script>
+<script>
+    var calUtil = {
+        /*
+            获取每个月的总天数
+        */
+        getDaysOfMonth: function (_YEAR, _MONTH) {
+            var date = new Date(_YEAR, _MONTH, 0);
+            var days = date.getDate();
+            return days;
+        },
+        /*
+            构建当前日历
+        */
+        bulidCal: function (_YEAR, _MONTH) {
+            /* 初始化日历 */
+            var signArray = new Array();
+            signArray[0] = new Array(7);
+            signArray[1] = new Array(7);
+            signArray[2] = new Array(7);
+            signArray[3] = new Array(7);
+            signArray[4] = new Array(7);
+            signArray[5] = new Array(7);
+            signArray[6] = new Array(7);
+            signArray[0][0] = "一";
+            signArray[0][1] = "二";
+            signArray[0][2] = "三";
+            signArray[0][3] = "四";
+            signArray[0][4] = "五";
+            signArray[0][5] = "六";
+            signArray[0][6] = "日";
+            var dCalDate = new Date(_YEAR, _MONTH - 1, 0);
+            var iDayOfFirst = dCalDate.getDay();
+            var iDaysInMonth = calUtil.getDaysOfMonth(_YEAR, _MONTH);
+            var iVarDate = 1;
+            var d, w;
+            for (d = iDayOfFirst; d < 7; d++) {
+                signArray[1][d] = iVarDate;
+                iVarDate++;
+            }
+            for (w = 2; w < 7; w++) {
+                for (d = 0; d < 7; d++) {
+                    if (iVarDate <= iDaysInMonth) {
+                        signArray[w][d] = iVarDate;
+                        iVarDate++;
+                    }
+                }
+            }
+            return signArray;
+        },
+        /*
+            已经签到的 显示高亮
+        */
+        ifHassSigned: function (signList, day) {
+            var signed = false;
+            for (var i = 0; i < signList.length; i++) {
+                var _date = new Date(signList[i]).getDate();
+                if (_date == day) {
+                    signed = true;
+                }
+            }
+            return signed;
+        },
+        /*
+            渲染到页面
+        */
+        drawCal: function (_YEAR, _MONTH, signList) {
+            var currentYearMonth = _YEAR + "年" + _MONTH + "月";
+            var myMonth = calUtil.bulidCal(_YEAR, _MONTH);
+            var _RenderDate = new Array();
+            _RenderDate.push('<div class="sinBox">');
+            _RenderDate.push('<p class="singDate">' + currentYearMonth + '</p>');
+            _RenderDate.push('<div>');
+            _RenderDate.push('<span>' + myMonth[0][0] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][1] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][2] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][3] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][4] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][5] + '</span>');
+            _RenderDate.push('<span>' + myMonth[0][6] + '</span>');
+            _RenderDate.push('</div>');
+            var d, w;
+            for (var w = 1; w < 7; w++) {
+                _RenderDate.push('<div>');
+                for (var d = 0; d < 7; d++) {
+                    var ifHasSigned = calUtil.ifHassSigned(signList, myMonth[w][d]);
+                    if (ifHasSigned) {
+                        _RenderDate.push('<span class="signSelect" weekday='+myMonth[w][d]+'>' + (!isNaN(myMonth[w][d]) ? myMonth[w][d] :
+                            " ") + '</span>');
+                    } else if (myMonth[w][d] < (new Date().getDate())) {
+                        _RenderDate.push('<span class="noSign" weekday='+myMonth[w][d]+'>' + (!isNaN(myMonth[w][d]) ? myMonth[w][d] : " ") +
+                            '</span>');
+                    } else if (myMonth[w][d] == (new Date().getDate())) {
+                        _RenderDate.push('<span class="nowSign" weekday='+myMonth[w][d]+'>' + (!isNaN(myMonth[w][d]) ? myMonth[w][d] :
+                            " ") + '</span>');
+                    } else {
+                        _RenderDate.push('<span weekday='+myMonth[w][d]+'>' + (!isNaN(myMonth[w][d]) ? myMonth[w][d] : " ") + '</span>');
+                    }
+                }
+                _RenderDate.push('</div>');
+            }
+            _RenderDate.push('</div>');
+            return _RenderDate.join('');
+        }
+    }
+    var signList = ['2018/10/20', '2018/10/15'];
+    var current = new Date();
+    var str = calUtil.drawCal(current.getFullYear(), current.getMonth() + 1, signList);
+    $("#singIn").append(str);
+
+    /*
+        点击签到
+    */
+    $(function(){
+        $(".singTit span").click(function () {
+            var signDays = $(".sinBox div");
+            for(var r=0;r<signDays.length;r++){
+                for(var y=0;y<signDays[r].children.length;y++){
+                    if((new Date().getDate())==signDays[r].children[y].getAttribute("weekday")){
+                        if(signDays[r].children[y].getAttribute("class")=="signSelect"){
+                            alert("您已经签到了，无需多次签到！");
+                        }else{
+                            signDays[r].children[y].classList.remove("nowSign");
+                            signDays[r].children[y].classList.add("signSelect");
+                            alert("签到成功");
+                        }
+                    }
+                }
+            }
+        });
+    })
+</script>
+
+</html>
